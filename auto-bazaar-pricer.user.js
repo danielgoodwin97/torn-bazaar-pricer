@@ -192,6 +192,10 @@ $(() => {
                 const popup = $('<div class="settings-popup"></div>'),
                     background = $('<div class="settings-popup-background"></div>');
 
+                // To account for feature updates and new configuration values, the values should be checked & updated
+                // if there are any missing configuration options in the existing options in local storage.
+                this.updateMissingConfigs();
+
                 // Style popup.
                 popup.css({
                     'display': 'none',
@@ -298,6 +302,31 @@ $(() => {
              */
             getOption: function (option) {
                 return pricer.options[option];
+            },
+
+            /**
+             * Check if there's been a configuration update.
+             * @returns {boolean}
+             */
+            getDifference: function () {
+                const current = _.keys(pricer.options),
+                    defaultValues = _.keys(defaults);
+
+                return _.difference(defaultValues, current);
+            },
+
+            /**
+             * Set any missing configuration options to default values.
+             */
+            updateMissingConfigs: function () {
+                const self = this,
+                    difference = this.getDifference();
+
+                if (!_.isEmpty(difference)) {
+                    _.each(difference, function (value) {
+                        self.setConfig(value, defaults[value]);
+                    });
+                }
             },
 
             /**
