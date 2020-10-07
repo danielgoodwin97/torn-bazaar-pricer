@@ -6,6 +6,8 @@
 // @author       FATU [1482556]
 // @match        *.torn.com/bazaar.php*
 // @grant        none
+// @updateURL    https://github.com/danielgoodwin97/torn-bazaar-pricer/raw/master/auto-bazaar-pricer.user.js
+// @downloadURL  https://github.com/danielgoodwin97/torn-bazaar-pricer/raw/master/auto-bazaar-pricer.user.js
 // ==/UserScript==
 
 $(() => {
