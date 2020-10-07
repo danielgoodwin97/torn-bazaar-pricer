@@ -8,6 +8,7 @@
 // @grant        none
 // @updateURL    https://github.com/danielgoodwin97/torn-bazaar-pricer/raw/master/auto-bazaar-pricer.user.js
 // @downloadURL  https://github.com/danielgoodwin97/torn-bazaar-pricer/raw/master/auto-bazaar-pricer.user.js
+// @supportURL   https://www.torn.com/messages.php#/p=compose&XID=1482556
 // ==/UserScript==
 
 $(() => {
