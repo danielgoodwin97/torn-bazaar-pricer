@@ -20,7 +20,8 @@ $(() => {
             key: null,
             interval: 1000,
             setPrices: true,
-            setQuantities: false
+            setQuantities: false,
+            amountBelowMarket: 1
         };
 
     // Auto-pricer object.
@@ -181,7 +182,8 @@ $(() => {
                 key: $('<label>Torn API key <input name="key" type="text" placeholder="Please enter an API key"></label>'),
                 interval: $('<label>API Interval <input name="interval" type="number"></label>'),
                 setPrices: $('<label>Automatically price items? <input name="pricing" type="checkbox"></label>'),
-                setQuantities: $('<label>Automatically set item quantity? <input name="quantity" type="checkbox"></label>')
+                setQuantities: $('<label>Automatically set item quantity? <input name="quantity" type="checkbox"></label>'),
+                amountBelowMarket: $('<label>Reduce price by<input name="amount-below" type="number"></label>')
             },
 
             /**
@@ -275,14 +277,15 @@ $(() => {
              * @param value {string|boolean} | Value for current input.
              */
             setConfig: function (inputKey, value) {
-                const {key, interval, setPrices, setQuantities} = pricer.options;
+                const {key, interval, setPrices, setQuantities, amountBelowMarket} = pricer.options;
 
                 // Create new configuration object.
                 let newConfig = {
                     key: key,
                     interval: interval,
                     setPrices: setPrices,
-                    setQuantities: setQuantities
+                    setQuantities: setQuantities,
+                    amountBelowMarket: amountBelowMarket
                 };
 
                 // Assign new changed value to new configuration object.
@@ -505,7 +508,7 @@ $(() => {
                         cheapest = Math.min(...lowestPrices);
 
                     // Set price to sell as a dollar lower.
-                    self.items[id].price = cheapest - 1;
+                    self.items[id].price = cheapest - self.options.amountBelowMarket;
                 },
 
                 /**
