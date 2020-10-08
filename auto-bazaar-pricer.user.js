@@ -199,7 +199,7 @@ $(() => {
 
                 // Update configuration if there is inconsistencies between defaults & stored configuration.
                 if (this.shouldUpdateConfiguration()) {
-                    this.updateConfiguration(this.setDefaults());
+                    this.updateConfiguration(options);
                 }
 
                 for (var input in this.inputs) {
@@ -231,15 +231,7 @@ $(() => {
              * @returns {boolean}
              */
             shouldUpdateConfiguration: function () {
-                return !!_.difference(_.keys(defaults), _.keys(options)).length;
-            },
-
-            /**
-             * Get configuration and add defaults if not set.
-             * @returns {*}
-             */
-            setDefaults: function () {
-                return _.defaults(options, defaults);
+                return !_.isEqual(_.sortBy(_.keys(options)), _.sortBy(_.keys(defaults)));
             },
 
             /**
@@ -247,7 +239,7 @@ $(() => {
              * @param value
              */
             updateConfiguration: function (value) {
-                var updatedConfiguration = _.merge(options, value);
+                var updatedConfiguration = _.pick(_.merge(_.defaults(options, defaults), value), _.keys(defaults));
 
                 // Update local options.
                 options = updatedConfiguration;
