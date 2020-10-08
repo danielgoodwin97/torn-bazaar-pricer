@@ -44,9 +44,9 @@ $(() => {
                 label: 'Automatically set quantity of items?',
                 type: 'checkbox'
             },
-            amountBelowMarket: {
-                value: 1,
-                label: 'Amount below market value',
+            priceModifier: {
+                value: -1,
+                label: 'Amount above or below market price',
                 type: 'number'
             }
         },
@@ -435,7 +435,7 @@ $(() => {
                         cheapest = Math.min(...lowestPrices);
 
                     // Set price to sell as a dollar lower.
-                    self.items[id].price = cheapest - options.amountBelowMarket.value;
+                    self.items[id].price = cheapest + parseInt(options.priceModifier.value);
                 },
 
                 /**
