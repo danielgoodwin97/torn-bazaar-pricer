@@ -180,7 +180,7 @@ $(() => {
             },
 
             /**
-             * All configuration option inputs.
+             * Build inputs with input information.
              */
             inputs: _.mapValues(options, function (item, key) {
                 var {value, label, type} = item,
