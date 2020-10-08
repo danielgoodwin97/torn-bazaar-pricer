@@ -356,7 +356,7 @@ $(() => {
                     inventory.forEach(function (value) {
                         const {name, ID, type, quantity, market_price, equipped} = value,
                             isMarketable = !!market_price,
-                            isEquipped = !!equipped,
+                            isEquipped = !!equipped && quantity === 1,
                             isInCurrentTab = currentTab ? type === currentTab : true;
 
                         // Only add item if it's tradeable.
