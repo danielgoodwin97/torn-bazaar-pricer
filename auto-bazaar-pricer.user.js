@@ -53,7 +53,7 @@ $(() => {
         options = GM_getValue(storage) || defaults;
 
     // Auto-pricer object.
-    let pricer = {
+    var pricer = {
         currentTab: null,
 
         // Current items.
@@ -72,7 +72,7 @@ $(() => {
              * Create loader element and add to page.
              */
             build: function () {
-                const wrapper = $('<div class="loader-wrap"></div>'),
+                var wrapper = $('<div class="loader-wrap"></div>'),
                     loader = $('<img src="https://i.imgur.com/u3DrfHr.gif" />'),
                     message = $('<div class="loader-message"></div>');
 
@@ -104,7 +104,7 @@ $(() => {
              * @returns {pricer}
              */
             show: function () {
-                const {image, message} = this.elements;
+                var {image, message} = this.elements;
 
                 image.show();
                 message.show();
@@ -117,7 +117,7 @@ $(() => {
              * @returns {pricer}
              */
             hide: function () {
-                const {image, message} = this.elements;
+                var {image, message} = this.elements;
 
                 image.hide();
                 message.hide();
@@ -139,7 +139,7 @@ $(() => {
              * Create element and add to page.
              */
             build: function () {
-                const buttons = [
+                var buttons = [
                     $('<a class="linkContainer___47uQr inRow___J1Bmd greyLineV___HQIEI auto-pricer-configure">Configure</a>'),
                     $('<a class="linkContainer___47uQr inRow___J1Bmd greyLineV___HQIEI auto-pricer-start">Start FATU\'s Pricer</a>')
                 ];
@@ -158,7 +158,7 @@ $(() => {
              * Set up button event listener.
              */
             setupListeners: function () {
-                const {start, configure} = this.elements;
+                var {start, configure} = this.elements;
 
                 start.on('click', function () {
                     pricer.gatherItems();
@@ -194,7 +194,7 @@ $(() => {
              * @returns {pricer}
              */
             build: function () {
-                const popup = $('<div class="settings-popup"></div>'),
+                var popup = $('<div class="settings-popup"></div>'),
                     background = $('<div class="settings-popup-background"></div>');
 
                 // Update configuration if there is inconsistencies between defaults & stored configuration.
@@ -202,8 +202,8 @@ $(() => {
                     this.updateConfiguration(this.setDefaults());
                 }
 
-                for (let input in this.inputs) {
-                    const currentInput = this.inputs[input];
+                for (var input in this.inputs) {
+                    var currentInput = this.inputs[input];
 
                     // Add input to popup.
                     popup.append(currentInput);
@@ -247,7 +247,7 @@ $(() => {
              * @param value
              */
             updateConfiguration: function (value) {
-                const updatedConfiguration = _.merge(options, value);
+                var updatedConfiguration = _.merge(options, value);
 
                 // Update local options.
                 options = updatedConfiguration;
@@ -260,7 +260,7 @@ $(() => {
              * Set up dismiss listeners for popup.
              */
             setupDismissListener: function () {
-                const self = this;
+                var self = this;
 
                 this.elements.background.on('click', function () {
                     self.hide();
@@ -273,11 +273,11 @@ $(() => {
              * @param input {object} | Input element.
              */
             setupInputListener: function (inputKey, input) {
-                const self = this,
+                var self = this,
                     inputElement = input.find('input');
 
                 inputElement.on('change', function () {
-                    const currentInput = $(this),
+                    var currentInput = $(this),
                         inputType = currentInput.attr('type'),
                         isCheckbox = inputType === 'checkbox';
 
@@ -310,7 +310,7 @@ $(() => {
          * Update current tab.
          */
         getCurrentTab: function () {
-            const currentTab = $('.ui-tabs-nav').find('.ui-state-active'),
+            var currentTab = $('.ui-tabs-nav').find('.ui-state-active'),
                 currentTabName = currentTab.find('a').attr('href').replace('#', '');
 
             pricer.currentTab = currentTabName !== 'All' ? currentTabName : null;
@@ -320,7 +320,7 @@ $(() => {
          * Grab all user items from API.
          */
         gatherItems: function () {
-            const self = this,
+            var self = this,
                 {currentTab} = self;
 
             // Show configuration popup when there's no API key.
@@ -350,11 +350,11 @@ $(() => {
                  * @param data {object} | Torn API response.
                  */
                 success: function (data) {
-                    const {inventory} = data;
+                    var {inventory} = data;
 
                     // Loop over all items in players inventory.
                     inventory.forEach(function (value) {
-                        const {name, ID, type, quantity, market_price, equipped} = value,
+                        var {name, ID, type, quantity, market_price, equipped} = value,
                             isMarketable = !!market_price,
                             isEquipped = !!equipped && quantity === 1,
                             isInCurrentTab = currentTab ? type === currentTab : true;
@@ -373,7 +373,7 @@ $(() => {
                  * Gather prices every selected interval (to not get API banned).
                  */
                 complete: function () {
-                    let i = 0;
+                    var i = 0;
 
                     // If there are no items, stop script.
                     if ($.isEmptyObject(self.items)) {
@@ -383,7 +383,7 @@ $(() => {
 
                     self.loader.update('All items gathered.');
 
-                    for (let id in pricer.items) {
+                    for (var id in pricer.items) {
                         setTimeout(function () {
                             self.getPrice(pricer.items[id].name, id);
                         }, options.interval.value * i);
@@ -408,7 +408,7 @@ $(() => {
          * @param id {number} | Item ID.
          */
         getPrice: function (name, id) {
-            const self = this;
+            var self = this;
 
             $.ajax({
                 url: 'https://api.torn.com/market/' + id,
@@ -430,7 +430,7 @@ $(() => {
                  * @param data {object} | Torn API response.
                  */
                 success: function (data) {
-                    const {bazaar, itemmarket} = data,
+                    var {bazaar, itemmarket} = data,
                         lowestPrices = [bazaar[0].cost, itemmarket[0].cost],
                         cheapest = Math.min(...lowestPrices);
 
@@ -456,13 +456,13 @@ $(() => {
          * @param id {number} | Item ID.
          */
         getInputs: function (name, id) {
-            const self = this,
+            var self = this,
                 item = $('.items-cont li:visible');
 
             // Rather than using IDs we now have to use item names due to the image canvas update which removed
             // the ability to grab IDs from the URLs.
             item.each(function () {
-                const currentItem = $(this),
+                var currentItem = $(this),
                     itemName = currentItem.find('.name-wrap .t-overflow').text();
 
                 // Add inputs to item object.
@@ -480,7 +480,7 @@ $(() => {
          * @returns {boolean}
          */
         isFinished: function () {
-            const items = this.items,
+            var items = this.items,
                 lastItem = items[Object.keys(items)[Object.keys(items).length - 1]];
 
             return !!lastItem.price;
@@ -490,10 +490,10 @@ $(() => {
          * Apply prices to price fields.
          */
         applyPricesAndQuantities: function () {
-            for (let item in this.items) {
+            for (var item in this.items) {
                 this.getInputs(this.items[item].name, item);
 
-                const {price, quantity, inputs} = this.items[item],
+                var {price, quantity, inputs} = this.items[item],
                     {setPrices, setQuantities} = options;
 
                 // If prices are set to be automatically added.
@@ -512,7 +512,7 @@ $(() => {
 
                     // Cannot trigger this event with jquery for some reason?
                     // Has to be done in vanilla JS.
-                    const event = new Event('input', {
+                    var event = new Event('input', {
                         bubbles: true,
                         cancelable: true,
                     });
@@ -526,7 +526,7 @@ $(() => {
 
     // Update current tab.
     $(document).on('click', '.ui-tabs-nav li', function () {
-        const {getCurrentTab} = pricer;
+        var {getCurrentTab} = pricer;
 
         setTimeout(function () {
             pricer.items = {};
@@ -536,7 +536,7 @@ $(() => {
 
     // Run script.
     $(window).on('hashchange load', function () {
-        const isAddPage = window.location.hash === '#/p=add' || window.location.hash === '#/add',
+        var isAddPage = window.location.hash === '#/p=add' || window.location.hash === '#/add',
             {loader, popup, buttons, getCurrentTab} = pricer;
 
         // Create all auto pricer elements & update current tab.
