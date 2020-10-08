@@ -7,6 +7,9 @@
 // @match        *.torn.com/bazaar.php*
 // @grant        GM_getValue
 // @grant        GM_setValue
+// @grant        GM_addStyle
+// @grant        GM_getResourceText
+// @resource     styles https://github.com/danielgoodwin97/torn-bazaar-pricer/raw/master/css/styles.css
 // @updateURL    https://github.com/danielgoodwin97/torn-bazaar-pricer/raw/master/auto-bazaar-pricer.user.js
 // @downloadURL  https://github.com/danielgoodwin97/torn-bazaar-pricer/raw/master/auto-bazaar-pricer.user.js
 // @supportURL   https://www.torn.com/messages.php#/p=compose&XID=1482556
@@ -14,6 +17,9 @@
 
 $(() => {
     'use strict';
+
+    // Add stylesheet.
+    GM_addStyle(GM_getResourceText('styles'));
 
     // Keys & defaults for script.
     var storage = 'auto-pricer',
@@ -69,27 +75,6 @@ $(() => {
                 const wrapper = $('<div class="loader-wrap"></div>'),
                     loader = $('<img src="https://i.imgur.com/u3DrfHr.gif" />'),
                     message = $('<div class="loader-message"></div>');
-
-                // Style loader image.
-                loader.css({
-                    'position': 'fixed',
-                    'top': 0,
-                    'left': 0,
-                    'height': '100%',
-                    'width': '100%',
-                    'background': 'rgba(255, 255, 255, .5)',
-                    'object-fit': 'none',
-                    'z-index': 2147483646
-                });
-
-                // Style message text.
-                message.css({
-                    'position': 'fixed',
-                    'top': '50%',
-                    'left': '50%',
-                    'transform': 'translate(-50%, -50%)',
-                    'z-index': 2147483647
-                });
 
                 // Add loader to document.
                 $('body').append(wrapper);
@@ -217,59 +202,14 @@ $(() => {
                     this.updateConfiguration(this.setDefaults());
                 }
 
-                // Style popup.
-                popup.css({
-                    'display': 'none',
-                    'position': 'fixed',
-                    'top': '50%',
-                    'left': '50%',
-                    'transform': 'translate(-50%, -50%)',
-                    'width': 'calc(100% - 20px)',
-                    'max-width': '325px',
-                    'padding': '10px',
-                    'background': '#fff',
-                    'border-radius': '3px',
-                    'box-sizing': 'border-box',
-                    'z-index': 2147483641
-                });
-
-                // Style popup background.
-                background.css({
-                    'display': 'none',
-                    'position': 'fixed',
-                    'top': 0,
-                    'left': 0,
-                    'height': '100%',
-                    'width': '100%',
-                    'background': 'rgba(0, 0, 0, .5)',
-                    'z-index': 2147483640
-                });
-
                 for (let input in this.inputs) {
-                    const currentInput = this.inputs[input],
-                        inputElement = currentInput.find('input');
+                    const currentInput = this.inputs[input];
 
                     // Add input to popup.
                     popup.append(currentInput);
 
                     // Set up listener for local storage options.
                     this.setupInputListener(input, currentInput);
-
-                    // Style input wrappers.
-                    currentInput.css({
-                        'display': 'flex',
-                        'flex-direction': 'column',
-                        'margin-bottom': '10px',
-                        'font-weight': 'bold'
-                    });
-
-                    // Style inputs.
-                    inputElement.css({
-                        'padding': '5px',
-                        'margin-top': '3px',
-                        'border': '1px solid #ccc',
-                        'border-radius': '3px'
-                    });
                 }
 
                 // Add popup & background to document.

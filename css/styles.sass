@@ -1,0 +1,53 @@
+.loader-wrap
+    img
+        position: fixed
+        top: 0
+        left: 0
+        height: 100%
+        width: 100%
+        background: rgba(255, 255, 255, .5)
+        object-fit: none
+        z-index: 2147483646
+
+    .loader-message
+        position: fixed
+        top: 50%
+        left: 50%
+        transform: translate(-50%, -50%)
+        z-index: 2147483647
+
+.settings-popup
+    display: none
+    position: fixed
+    top: 50%
+    left: 50%
+    transform: translate(-50%, -50%)
+    max-width: 325px
+    width: calc(100% - 20px)
+    padding: 10px
+    background: #fff
+    border-radius: 3px
+    box-sizing: border-box
+    z-index: 2147483641
+
+    label
+        display: flex
+        flex-direction: column
+        margin-bottom: 10px
+        font-weight: bold
+
+        input
+            margin-top: 3px
+            padding: 5px
+            border: 1px solid #ccc
+            border-radius: 3px
+
+.settings-popup-background
+    display: none
+    position: fixed
+    top: 0
+    left: 0
+    height: 100%
+    width: 100%
+    background: rgba(0, 0, 0, .5)
+    z-index: 2147483640
