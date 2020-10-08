@@ -5,7 +5,8 @@
 // @description  Automatically price & add quantity to bazaar items.
 // @author       FATU [1482556]
 // @match        *.torn.com/bazaar.php*
-// @grant        none
+// @grant        GM_getValue
+// @grant        GM_setValue
 // @updateURL    https://github.com/danielgoodwin97/torn-bazaar-pricer/raw/master/auto-bazaar-pricer.user.js
 // @downloadURL  https://github.com/danielgoodwin97/torn-bazaar-pricer/raw/master/auto-bazaar-pricer.user.js
 // @supportURL   https://www.torn.com/messages.php#/p=compose&XID=1482556
@@ -15,20 +16,38 @@ $(() => {
     'use strict';
 
     // Keys & defaults for script.
-    const storage = 'auto-pricer',
+    var storage = 'auto-pricer',
         defaults = {
-            key: null,
-            interval: 1000,
-            setPrices: true,
-            setQuantities: false,
-            amountBelowMarket: 1
-        };
+            key: {
+                value: null,
+                label: 'API Key',
+                type: 'text'
+            },
+            interval: {
+                value: 1000,
+                label: 'Interval between API calls',
+                type: 'number'
+            },
+            setPrices: {
+                value: true,
+                label: 'Automatically price items?',
+                type: 'checkbox'
+            },
+            setQuantities: {
+                value: false,
+                label: 'Automatically set quantity of items?',
+                type: 'checkbox'
+            },
+            amountBelowMarket: {
+                value: 1,
+                label: 'Amount below market value',
+                type: 'number'
+            }
+        },
+        options = GM_getValue(storage) || defaults;
 
     // Auto-pricer object.
     let pricer = {
-        // Use stored configuration settings or use defaults.
-        options: JSON.parse(localStorage.getItem(storage)) || defaults,
-
         currentTab: null,
 
         // Current items.
@@ -178,13 +197,12 @@ $(() => {
             /**
              * All configuration option inputs.
              */
-            inputs: {
-                key: $('<label>Torn API key <input name="key" type="text" placeholder="Please enter an API key"></label>'),
-                interval: $('<label>API Interval <input name="interval" type="number"></label>'),
-                setPrices: $('<label>Automatically price items? <input name="pricing" type="checkbox"></label>'),
-                setQuantities: $('<label>Automatically set item quantity? <input name="quantity" type="checkbox"></label>'),
-                amountBelowMarket: $('<label>Reduce price by<input name="amount-below" type="number"></label>')
-            },
+            inputs: _.mapValues(options, function (item, key) {
+                var {value, label, type} = item,
+                    hasValue = !!value;
+
+                return $(`<label>${label} <input name="${key}" type="${type}" value="${hasValue ? value : ''}" ${hasValue ? 'checked' : ''} /></label>`);
+            }),
 
             /**
              * Create element and add to page.
@@ -194,9 +212,10 @@ $(() => {
                 const popup = $('<div class="settings-popup"></div>'),
                     background = $('<div class="settings-popup-background"></div>');
 
-                // To account for feature updates and new configuration values, the values should be checked & updated
-                // if there are any missing configuration options in the existing options in local storage.
-                this.updateMissingConfigs();
+                // Update configuration if there is inconsistencies between defaults & stored configuration.
+                if (this.shouldUpdateConfiguration()) {
+                    this.updateConfiguration(this.setDefaults());
+                }
 
                 // Style popup.
                 popup.css({
@@ -228,15 +247,10 @@ $(() => {
 
                 for (let input in this.inputs) {
                     const currentInput = this.inputs[input],
-                        inputElement = currentInput.find('input'),
-                        inputType = inputElement.attr('type'),
-                        isInput = inputType === 'text' || inputType === 'number';
+                        inputElement = currentInput.find('input');
 
                     // Add input to popup.
                     popup.append(currentInput);
-
-                    // Set existing value.
-                    isInput ? inputElement.val(this.getOption(input)) : inputElement.prop('checked', this.getOption(input));
 
                     // Set up listener for local storage options.
                     this.setupInputListener(input, currentInput);
@@ -271,65 +285,35 @@ $(() => {
                 return this;
             },
 
-            /**
-             * Completely overwrite old configuration options when an option is updated.
-             * @param inputKey {string} | Storage key for configuration option.
-             * @param value {string|boolean} | Value for current input.
-             */
-            setConfig: function (inputKey, value) {
-                const {key, interval, setPrices, setQuantities, amountBelowMarket} = pricer.options;
-
-                // Create new configuration object.
-                let newConfig = {
-                    key: key,
-                    interval: interval,
-                    setPrices: setPrices,
-                    setQuantities: setQuantities,
-                    amountBelowMarket: amountBelowMarket
-                };
-
-                // Assign new changed value to new configuration object.
-                newConfig[inputKey] = value;
-
-                // Update current configuration.
-                pricer.options = newConfig;
-
-                // Update local storage configuration.
-                localStorage.setItem(storage, JSON.stringify(newConfig));
-            },
 
             /**
-             * Get configuration option.
-             * @param option {string} | Configuration option stored in configuration object.
-             * @returns {*}
-             */
-            getOption: function (option) {
-                return pricer.options[option];
-            },
-
-            /**
-             * Check if there's been a configuration update.
+             * Check if configuration needs updating.
              * @returns {boolean}
              */
-            getDifference: function () {
-                const current = _.keys(pricer.options),
-                    defaultValues = _.keys(defaults);
-
-                return _.difference(defaultValues, current);
+            shouldUpdateConfiguration: function () {
+                return !!_.difference(_.keys(defaults), _.keys(options)).length;
             },
 
             /**
-             * Set any missing configuration options to default values.
+             * Get configuration and add defaults if not set.
+             * @returns {*}
              */
-            updateMissingConfigs: function () {
-                const self = this,
-                    difference = this.getDifference();
+            setDefaults: function () {
+                return _.defaults(options, defaults);
+            },
 
-                if (!_.isEmpty(difference)) {
-                    _.each(difference, function (value) {
-                        self.setConfig(value, defaults[value]);
-                    });
-                }
+            /**
+             * Update configuration in storage.
+             * @param value
+             */
+            updateConfiguration: function (value) {
+                const updatedConfiguration = _.merge(options, value);
+
+                // Update local options.
+                options = updatedConfiguration;
+
+                // Update storage options.
+                GM_setValue(storage, updatedConfiguration);
             },
 
             /**
@@ -344,7 +328,7 @@ $(() => {
             },
 
             /**
-             * Set up listeners for storing config options in local storage.
+             * Set up listeners for updating configuration options in storage.
              * @param inputKey {string} | Storage key for configuration option.
              * @param input {object} | Input element.
              */
@@ -355,10 +339,13 @@ $(() => {
                 inputElement.on('change', function () {
                     const currentInput = $(this),
                         inputType = currentInput.attr('type'),
-                        isInput = inputType === 'text' || inputType === 'number';
+                        isCheckbox = inputType === 'checkbox';
 
-                    // Change saving behaviour based on whether the input is text/number or checkbox/radio.
-                    isInput ? self.setConfig(inputKey, currentInput.val()) : self.setConfig(inputKey, currentInput.prop('checked'));
+                    self.updateConfiguration({
+                        [inputKey]: {
+                            value: isCheckbox ? currentInput.prop('checked') : currentInput.val()
+                        }
+                    });
                 });
             },
 
@@ -397,7 +384,7 @@ $(() => {
                 {currentTab} = self;
 
             // Show configuration popup when there's no API key.
-            if (!self.options.key) {
+            if (!options.key.value) {
                 self.popup.show();
 
                 return false;
@@ -408,7 +395,7 @@ $(() => {
 
                 data: {
                     selections: 'inventory',
-                    key: self.options.key
+                    key: options.key.value
                 },
 
                 /**
@@ -459,7 +446,7 @@ $(() => {
                     for (let id in pricer.items) {
                         setTimeout(function () {
                             self.getPrice(pricer.items[id].name, id);
-                        }, pricer.options.interval * i);
+                        }, options.interval.value * i);
 
                         i++;
                     }
@@ -488,7 +475,7 @@ $(() => {
 
                 data: {
                     selections: 'bazaar,itemmarket',
-                    key: self.options.key
+                    key: options.key.value
                 },
 
                 /**
@@ -508,7 +495,7 @@ $(() => {
                         cheapest = Math.min(...lowestPrices);
 
                     // Set price to sell as a dollar lower.
-                    self.items[id].price = cheapest - self.options.amountBelowMarket;
+                    self.items[id].price = cheapest - options.amountBelowMarket.value;
                 },
 
                 /**
@@ -567,16 +554,16 @@ $(() => {
                 this.getInputs(this.items[item].name, item);
 
                 const {price, quantity, inputs} = this.items[item],
-                    {setPrices, setQuantities} = this.options;
+                    {setPrices, setQuantities} = options;
 
                 // If prices are set to be automatically added.
-                if (setPrices) {
+                if (setPrices.value) {
                     inputs.price.val(price);
                     inputs.price.trigger('keyup');
                 }
 
                 // If quantities are set to be automatically added.
-                if (setQuantities) {
+                if (setQuantities.value) {
                     inputs.quantity.val(quantity);
 
                     if (inputs.quantity.attr('type') === 'checkbox') {
