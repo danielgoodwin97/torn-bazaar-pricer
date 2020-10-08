@@ -21,7 +21,7 @@ $(() => {
     // Add stylesheet.
     GM_addStyle(GM_getResourceText('styles'));
 
-    // Keys & defaults for script.
+    // Defaults for script.
     var storage = 'auto-pricer',
         defaults = {
             key: {
@@ -51,6 +51,36 @@ $(() => {
             }
         },
         options = GM_getValue(storage) || defaults;
+
+    // Configuration methods.
+    var configuration = {
+        /**
+         * Check if configuration needs updating.
+         * @returns {boolean}
+         */
+        shouldUpdate: function () {
+            return !_.isEqual(_.sortBy(_.keys(options)), _.sortBy(_.keys(defaults)));
+        },
+
+        /**
+         * Update configuration in storage.
+         * @param value
+         */
+        update: function (value) {
+            var updatedConfiguration = _.pick(_.merge(_.defaults(options, defaults), value), _.keys(defaults));
+
+            // Update local options.
+            options = updatedConfiguration;
+
+            // Update storage options.
+            GM_setValue(storage, updatedConfiguration);
+        },
+    };
+
+    // Update configuration values if anything has changed with default values.
+    if (configuration.shouldUpdate()) {
+        configuration.update();
+    }
 
     // Auto-pricer object.
     var pricer = {
@@ -197,11 +227,6 @@ $(() => {
                 var popup = $('<div class="settings-popup"></div>'),
                     background = $('<div class="settings-popup-background"></div>');
 
-                // Update configuration if there is inconsistencies between defaults & stored configuration.
-                if (this.shouldUpdateConfiguration()) {
-                    this.updateConfiguration(options);
-                }
-
                 for (var input in this.inputs) {
                     var currentInput = this.inputs[input];
 
@@ -227,28 +252,6 @@ $(() => {
 
 
             /**
-             * Check if configuration needs updating.
-             * @returns {boolean}
-             */
-            shouldUpdateConfiguration: function () {
-                return !_.isEqual(_.sortBy(_.keys(options)), _.sortBy(_.keys(defaults)));
-            },
-
-            /**
-             * Update configuration in storage.
-             * @param value
-             */
-            updateConfiguration: function (value) {
-                var updatedConfiguration = _.pick(_.merge(_.defaults(options, defaults), value), _.keys(defaults));
-
-                // Update local options.
-                options = updatedConfiguration;
-
-                // Update storage options.
-                GM_setValue(storage, updatedConfiguration);
-            },
-
-            /**
              * Set up dismiss listeners for popup.
              */
             setupDismissListener: function () {
@@ -265,15 +268,14 @@ $(() => {
              * @param input {object} | Input element.
              */
             setupInputListener: function (inputKey, input) {
-                var self = this,
-                    inputElement = input.find('input');
+                var inputElement = input.find('input');
 
                 inputElement.on('change', function () {
                     var currentInput = $(this),
                         inputType = currentInput.attr('type'),
                         isCheckbox = inputType === 'checkbox';
 
-                    self.updateConfiguration({
+                    configuration.update({
                         [inputKey]: {
                             value: isCheckbox ? currentInput.prop('checked') : currentInput.val()
                         }
