@@ -224,18 +224,17 @@ $(() => {
              * @returns {pricer}
              */
             build: function () {
-                var popup = $('<div class="settings-popup"></div>'),
+                var self = this,
+                    popup = $('<div class="settings-popup"></div>'),
                     background = $('<div class="settings-popup-background"></div>');
 
-                for (var input in this.inputs) {
-                    var currentInput = this.inputs[input];
-
+                _.each(this.inputs, function (value, key) {
                     // Add input to popup.
-                    popup.append(currentInput);
+                    popup.append(value);
 
                     // Set up listener for local storage options.
-                    this.setupInputListener(input, currentInput);
-                }
+                    self.setupInputListener(key, value);
+                });
 
                 // Add popup & background to document.
                 $('body').append(popup).append(background);
@@ -377,13 +376,13 @@ $(() => {
 
                     self.loader.update('All items gathered.');
 
-                    for (var id in pricer.items) {
+                    _.each(pricer.items, function (value, key) {
                         setTimeout(function () {
-                            self.getPrice(pricer.items[id].name, id);
+                            self.getPrice(value.name, key);
                         }, options.interval.value * i);
 
                         i++;
-                    }
+                    });
                 },
 
                 /**
@@ -484,10 +483,12 @@ $(() => {
          * Apply prices to price fields.
          */
         applyPricesAndQuantities: function () {
-            for (var item in this.items) {
-                this.getInputs(this.items[item].name, item);
+            var self = this;
 
-                var {price, quantity, inputs} = this.items[item],
+            _.each(this.items, function (value, key) {
+                self.getInputs(value.name, key);
+
+                var {price, quantity, inputs} = value,
                     {setPrices, setQuantities} = options;
 
                 // If prices are set to be automatically added.
@@ -514,7 +515,7 @@ $(() => {
                     // Trigger update event.
                     inputs.quantity[0].dispatchEvent(event);
                 }
-            }
+            });
         }
     };
 
