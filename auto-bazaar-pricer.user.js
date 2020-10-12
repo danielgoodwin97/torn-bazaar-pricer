@@ -424,11 +424,13 @@ $(() => {
                  */
                 success: function (data) {
                     var {bazaar, itemmarket} = data,
-                        lowestPrices = [bazaar[0].cost, itemmarket[0].cost],
-                        cheapest = Math.min(...lowestPrices);
+                        allPrices = _.without(_.concat(itemmarket, bazaar), null),
+                        cheapestItem = _.min(_.toArray(_.mapValues(allPrices, function (value) {
+                            return value.cost;
+                        })));
 
                     // Set price to sell as a dollar lower.
-                    self.items[id].price = cheapest + parseInt(options.priceModifier.value);
+                    self.items[id].price = cheapestItem + parseInt(options.priceModifier.value);
                 },
 
                 /**
