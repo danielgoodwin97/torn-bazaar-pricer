@@ -170,11 +170,11 @@ $(() => {
              */
             build: function () {
                 var buttons = [
-                    $('<a class="linkContainer___47uQr inRow___J1Bmd greyLineV___HQIEI auto-pricer-configure">Configure</a>'),
-                    $('<a class="linkContainer___47uQr inRow___J1Bmd greyLineV___HQIEI auto-pricer-start">Start FATU\'s Pricer</a>')
+                    $('<a class="linkContainer___1dLm- inRow___2mEag greyLineV___2_WJ8 auto-pricer-configure">Configure</a>'),
+                    $('<a class="linkContainer___1dLm- inRow___2mEag greyLineV___2_WJ8 auto-pricer-start">Start FATU\'s Pricer</a>')
                 ];
 
-                $('.linksContainer___2Kgsm').prepend(buttons);
+                $('.linksContainer___3r-Lt').prepend(buttons);
 
                 this.elements = {
                     start: buttons[1],
