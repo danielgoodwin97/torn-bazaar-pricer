@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Torn - Bazaar Pricer
 // @namespace    https://github.com/danielgoodwin97/torn-bazaar-pricer
-// @version      1.5.7
+// @version      1.5.8
 // @description  Automatically price & add quantity to bazaar items.
 // @author       FATU [1482556]
 // @match        *.torn.com/bazaar.php*
