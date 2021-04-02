@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Torn - Bazaar Pricer
 // @namespace    https://github.com/danielgoodwin97/torn-bazaar-pricer
-// @version      1.5.8
+// @version      1.5.9
 // @description  Automatically price & add quantity to bazaar items.
 // @author       FATU [1482556]
 // @match        *.torn.com/bazaar.php*
@@ -493,10 +493,16 @@ $(() => {
                 var {price, quantity, inputs} = value,
                     {setPrices, setQuantities} = options;
 
+                // Cannot trigger this event with jquery for some reason?
+                // Has to be done in vanilla JS.
+                var event = new Event('input', {
+                    bubbles: true,
+                    cancelable: true,
+                });
+
                 // If prices are set to be automatically added.
                 if (setPrices.value) {
                     inputs.price.val(price);
-                    inputs.price.trigger('keyup');
                 }
 
                 // If quantities are set to be automatically added.
@@ -506,17 +512,12 @@ $(() => {
                     if (inputs.quantity.attr('type') === 'checkbox') {
                         inputs.quantity.next('a').click();
                     }
-
-                    // Cannot trigger this event with jquery for some reason?
-                    // Has to be done in vanilla JS.
-                    var event = new Event('input', {
-                        bubbles: true,
-                        cancelable: true,
-                    });
-
-                    // Trigger update event.
-                    inputs.quantity[0].dispatchEvent(event);
                 }
+
+                // Trigger update event.
+                _.each(inputs, function (input) {
+                    input[0].dispatchEvent(event);
+                });
             });
         }
     };
