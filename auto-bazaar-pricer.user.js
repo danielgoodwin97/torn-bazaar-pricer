@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Torn - Bazaar Pricer
 // @namespace    https://github.com/danielgoodwin97/torn-bazaar-pricer
-// @version      1.5.9
+// @version      1.5.10
 // @description  Automatically price & add quantity to bazaar items.
 // @author       FATU [1482556]
 // @match        *.torn.com/bazaar.php*
@@ -50,7 +50,7 @@ $(() => {
                 type: 'number'
             }
         },
-        options = GM_getValue(storage) || defaults;
+        options = /*GM_getValue(storage) ||*/ defaults;
 
     // Configuration methods.
     var configuration = {
@@ -169,12 +169,20 @@ $(() => {
              * Create element and add to page.
              */
             build: function () {
-                var buttons = [
-                    $('<a class="linkContainer___1dLm- inRow___2mEag greyLineV___2_WJ8 auto-pricer-configure">Configure</a>'),
-                    $('<a class="linkContainer___1dLm- inRow___2mEag greyLineV___2_WJ8 auto-pricer-start">Start FATU\'s Pricer</a>')
-                ];
+                var $container = $('[class^="linksContainer_"');
+                var $link = $('[class^="linkContainer_"');
+                var classes = '';
+                for (const cls of $link.get(0).classList.values()) {
+                    if (cls.indexOf('__') >= 0) {
+                        classes += cls + ' ';
+                    }
+                }
 
-                $('.linksContainer___3r-Lt').prepend(buttons);
+                var buttons = [
+                    $(`<a class="${classes}auto-pricer-configure">Configure</a>`),
+                    $(`<a class="${classes}auto-pricer-start">Start FATU\'s Pricer</a>`)
+                ];
+                $container.prepend(buttons);
 
                 this.elements = {
                     start: buttons[1],
