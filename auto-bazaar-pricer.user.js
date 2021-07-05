@@ -50,7 +50,7 @@ $(() => {
                 type: 'number'
             }
         },
-        options = /*GM_getValue(storage) ||*/ defaults;
+        options = GM_getValue(storage) || defaults;
 
     // Configuration methods.
     var configuration = {
