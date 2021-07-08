@@ -169,14 +169,9 @@ $(() => {
              * Create element and add to page.
              */
             build: function () {
-                var $container = $('[class^="linksContainer_"');
-                var $link = $('[class^="linkContainer_"');
-                var classes = '';
-                for (const cls of $link.get(0).classList.values()) {
-                    if (cls.indexOf('__') >= 0) {
-                        classes += cls + ' ';
-                    }
-                }
+                const container = $('[class^="linksContainer_"'),
+                    link = $('[class^="linkContainer_"'),
+                    classes = link[0].className;
 
                 var buttons = [
                     $(`<a class="${classes}auto-pricer-configure">Configure</a>`),
