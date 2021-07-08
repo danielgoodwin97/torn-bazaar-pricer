@@ -177,7 +177,7 @@ $(() => {
                     $(`<a class="${classes} auto-pricer-configure">Configure</a>`),
                     $(`<a class="${classes} auto-pricer-start">Start FATU\'s Pricer</a>`)
                 ];
-                
+
                 container.prepend(buttons);
 
                 this.elements = {
