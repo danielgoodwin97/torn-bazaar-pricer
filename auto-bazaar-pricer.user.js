@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Torn - Bazaar Pricer
 // @namespace    https://github.com/danielgoodwin97/torn-bazaar-pricer
-// @version      1.5.10
+// @version      1.5.11
 // @description  Automatically price & add quantity to bazaar items.
 // @author       FATU [1482556]
 // @match        *.torn.com/bazaar.php*
@@ -327,75 +327,56 @@ $(() => {
                 return false;
             }
 
-            $.ajax({
-                url: 'https://api.torn.com/user',
+            // Show loader.
+            self.loader.show();
 
-                data: {
-                    selections: 'inventory',
-                    key: options.key.value
+            // Get inventory.
+            var inventory = fetch(`/inventory.php?rfcv=${unsafeWindow.getRFC()}`, {
+                headers: {
+                    'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                    'x-requested-with': 'XMLHttpRequest'
                 },
+                body: `step=getList&type=${currentTab ? currentTab : 'All'}&start=0`,
+                method: 'POST'
+            });
 
-                /**
-                 * Show loader and update text before AJAX fires.
-                 */
-                beforeSend: function () {
-                    self.loader.show().update('Preparing to gather all user items.');
-                },
+            // Loop over all inventory items.
+            inventory.then(response => response.json()).then(({ list }) => {
+                // Loop over all items in players inventory.
+                list.forEach(function (value) {
+                    var {name, itemID, type, Qty, averageprice, equiped} = value,
+                        isMarketable = !!averageprice,
+                        isEquipped = !!equiped && Qty === 1;
 
-                /**
-                 * Set up item in items object when scraped.
-                 * @param data {object} | Torn API response.
-                 */
-                success: function (data) {
-                    var {inventory} = data;
-
-                    // Loop over all items in players inventory.
-                    inventory.forEach(function (value) {
-                        var {name, ID, type, quantity, market_price, equipped} = value,
-                            isMarketable = !!market_price,
-                            isEquipped = !!equipped && quantity === 1,
-                            isInCurrentTab = currentTab ? type === currentTab : true;
-
-                        // Only add item if it's tradeable.
-                        if (isMarketable && !isEquipped && isInCurrentTab) {
-                            self.items[ID] = {
-                                name: name,
-                                quantity: quantity
-                            }
+                    // Only add item if it's tradeable.
+                    if (isMarketable && !isEquipped) {
+                        self.items[itemID] = {
+                            name: name,
+                            quantity: Qty
                         }
-                    });
-                },
-
-                /**
-                 * Gather prices every selected interval (to not get API banned).
-                 */
-                complete: function () {
-                    var i = 0;
-
-                    // If there are no items, stop script.
-                    if ($.isEmptyObject(self.items)) {
-                        self.loader.hide();
-                        console.log('No items were scraped. Please try again.');
                     }
+                });
+            }).then(() => {
+                var i = 0;
 
-                    self.loader.update('All items gathered.');
-
-                    _.each(pricer.items, function (value, key) {
-                        setTimeout(function () {
-                            self.getPrice(value.name, key);
-                        }, options.interval.value * i);
-
-                        i++;
-                    });
-                },
-
-                /**
-                 * If anything went wrong, hide the loader.
-                 */
-                error: function () {
+                // If there are no items, stop script.
+                if ($.isEmptyObject(self.items)) {
                     self.loader.hide();
-                    console.log('There was an error. Please try again.');
+                    console.log('No items were scraped. Please try again.');
                 }
+
+                self.loader.update('All items gathered.');
+
+                _.each(pricer.items, function (value, key) {
+                    setTimeout(function () {
+                        self.getPrice(value.name, key);
+                    }, options.interval.value * i);
+
+                    i++;
+                });
+            }).catch(() => {
+                self.loader.hide();
+                console.log('There was an error. Please try again.');
             });
         },
 
