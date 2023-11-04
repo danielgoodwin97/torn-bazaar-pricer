@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Torn - Bazaar Pricer
 // @namespace    https://github.com/danielgoodwin97/torn-bazaar-pricer
-// @version      1.5.12
+// @version      1.5.13
 // @description  Automatically price & add quantity to bazaar items.
 // @author       FATU [1482556]
 // @match        *.torn.com/bazaar.php*
@@ -345,7 +345,7 @@ $(() => {
                 // Loop over all items in players inventory.
                 list.forEach(function (value) {
                     var {name, itemID, type, Qty, averageprice, equiped} = value,
-                        isMarketable = !!averageprice,
+                        isMarketable = !!parseFloat(averageprice),
                         isEquipped = !!parseInt(equiped) && Qty === 1;
 
                     // Only add item if it's tradeable.
