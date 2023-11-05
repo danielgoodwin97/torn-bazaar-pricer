@@ -344,8 +344,8 @@ $(() => {
             inventory.then(response => response.json()).then(({ list }) => {
                 // Loop over all items in players inventory.
                 list.forEach(function (value) {
-                    var {name, itemID, type, Qty, averageprice, equiped} = value,
-                        isMarketable = !!parseFloat(averageprice),
+                    var {name, itemID, type, Qty, averageprice, equiped, untradable} = value,
+                        isMarketable = !!parseFloat(averageprice) || !parseInt(untradable),
                         isEquipped = !!parseInt(equiped) && Qty === 1;
 
                     // Only add item if it's tradeable.
