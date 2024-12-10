@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Torn - Bazaar Pricer
 // @namespace    https://github.com/danielgoodwin97/torn-bazaar-pricer
-// @version      1.5.14
+// @version      1.6
 // @description  Automatically price & add quantity to bazaar items.
 // @author       FATU [1482556]
 // @match        *.torn.com/bazaar.php*
@@ -389,7 +389,7 @@ $(() => {
             var self = this;
 
             $.ajax({
-                url: 'https://api.torn.com/market/' + id,
+                url: 'https://api.torn.com/v2/market/' + id,
 
                 data: {
                     selections: 'bazaar,itemmarket',
@@ -408,10 +408,10 @@ $(() => {
                  * @param data {object} | Torn API response.
                  */
                 success: function (data) {
-                    var {bazaar, itemmarket} = data,
-                        allPrices = _.without(_.concat(itemmarket, bazaar), null),
+                    var {itemmarket} = data,
+                        allPrices = _.without(_.concat(itemmarket.listings || []), null),
                         cheapestItem = _.min(_.toArray(_.mapValues(allPrices, function (value) {
-                            return value.cost;
+                            return value.price;
                         })));
 
                     // Set price to sell as a dollar lower.
