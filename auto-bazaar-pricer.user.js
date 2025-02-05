@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         Torn - Bazaar Pricer
 // @namespace    https://github.com/danielgoodwin97/torn-bazaar-pricer
-// @version      1.6
-// @description  Automatically price & add quantity to bazaar items.
+// @version      2.0
+// @description  Automatically price items in the item market.
 // @author       FATU [1482556]
-// @match        *.torn.com/bazaar.php*
+// @match        *.torn.com/page.php?sid=ItemMarket*
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_addStyle
@@ -307,8 +307,8 @@ $(() => {
          * Update current tab.
          */
         getCurrentTab: function () {
-            var currentTab = $('.ui-tabs-nav').find('.ui-state-active'),
-                currentTabName = currentTab.find('a').attr('href').replace('#', '');
+            var currentTab = $('[class^="tabs___"]').find('[data-headlessui-state=selected]'),
+                currentTabName = currentTab.attr('aria-label').replace('View ', '');
 
             pricer.currentTab = currentTabName !== 'All' ? currentTabName : null;
         },
@@ -437,19 +437,19 @@ $(() => {
          */
         getInputs: function (name, id) {
             var self = this,
-                item = $('.items-cont li:visible');
+                item = $('[class^="itemRowWrapper___"]');
 
             // Rather than using IDs we now have to use item names due to the image canvas update which removed
             // the ability to grab IDs from the URLs.
             item.each(function () {
                 var currentItem = $(this),
-                    itemName = currentItem.find('.name-wrap .t-overflow').text();
+                    itemName = currentItem.find('[class^="name___"]').text();
 
                 // Add inputs to item object.
                 if (name === itemName) {
                     self.items[id].inputs = {
-                        price: currentItem.find('input[type="text"].input-money'),
-                        quantity: currentItem.find('.amount input')
+                        price: currentItem.find('[class^="priceInputWrapper___"] input:not([type="hidden"])'),
+                        quantity: currentItem.find('[class^="amountInputWrapper___"] input:not([type="hidden"]), [class^="checkboxWrapper___"] [id*="selectCheckbox"]')
                     };
                 }
             });
@@ -495,12 +495,16 @@ $(() => {
                     inputs.quantity.val(quantity);
 
                     if (inputs.quantity.attr('type') === 'checkbox') {
-                        inputs.quantity.next('a').click();
+                        inputs.quantity.next('label').click();
                     }
                 }
 
                 // Trigger update event.
                 _.each(inputs, function (input) {
+                    if (!input.length) {
+                        return;
+                    }
+
                     input[0].dispatchEvent(event);
                 });
             });
@@ -508,7 +512,7 @@ $(() => {
     };
 
     // Update current tab.
-    $(document).on('click', '.ui-tabs-nav li', function () {
+    $(document).on('click', '[class^="tabs___"] [class^="tab___"]', function () {
         var {getCurrentTab} = pricer;
 
         setTimeout(function () {
@@ -519,7 +523,7 @@ $(() => {
 
     // Run script.
     $(window).on('hashchange load', function () {
-        var isAddPage = window.location.hash === '#/p=add' || window.location.hash === '#/add',
+        var isAddPage = window.location.hash === '#/addListing',
             {loader, popup, buttons, getCurrentTab} = pricer;
 
         // Create all auto pricer elements & update current tab.
