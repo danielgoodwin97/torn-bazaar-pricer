@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Torn - Item Market Pricer
 // @namespace    https://github.com/danielgoodwin97/torn-item-market-pricer
-// @version      2.0
+// @version      2.0.1
 // @description  Automatically price items in the item market.
 // @author       FATU [1482556]
 // @match        *.torn.com/page.php?sid=ItemMarket*
