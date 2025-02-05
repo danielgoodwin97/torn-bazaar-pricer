@@ -1,6 +1,6 @@
 // ==UserScript==
-// @name         Torn - Bazaar Pricer
-// @namespace    https://github.com/danielgoodwin97/torn-bazaar-pricer
+// @name         Torn - Item Market Pricer
+// @namespace    https://github.com/danielgoodwin97/torn-item-market-pricer
 // @version      2.0
 // @description  Automatically price items in the item market.
 // @author       FATU [1482556]
@@ -9,9 +9,9 @@
 // @grant        GM_setValue
 // @grant        GM_addStyle
 // @grant        GM_getResourceText
-// @resource     styles https://github.com/danielgoodwin97/torn-bazaar-pricer/raw/master/css/styles.css
-// @updateURL    https://github.com/danielgoodwin97/torn-bazaar-pricer/raw/master/auto-bazaar-pricer.user.js
-// @downloadURL  https://github.com/danielgoodwin97/torn-bazaar-pricer/raw/master/auto-bazaar-pricer.user.js
+// @resource     styles https://github.com/danielgoodwin97/torn-item-market-pricer/raw/master/css/styles.css
+// @updateURL    https://github.com/danielgoodwin97/torn-item-market-pricer/raw/master/auto-bazaar-pricer.user.js
+// @downloadURL  https://github.com/danielgoodwin97/torn-item-market-pricer/raw/master/auto-bazaar-pricer.user.js
 // @supportURL   https://www.torn.com/messages.php#/p=compose&XID=1482556
 // ==/UserScript==
 
