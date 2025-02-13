@@ -1,6 +1,6 @@
-# Torn - Automatic Bazaar Pricer
+# Torn - Automatic Item Market Pricer
 ### General
-This script will automatically price items when adding them to your bazaar. You can also enable automatic quantity setting which will get the total quantity of the item & add it to the quantity field.
+This script will automatically price items when adding them to the item market. You can also enable automatic quantity setting which will get the total quantity of the item & add it to the quantity field.
 
 It is recommended that you run this script using only `Tampermonkey` & `Chrome`.
 
@@ -18,7 +18,7 @@ This script needs:
 2. Click the install button when new window is opened.
 3. Once installed, head to [Torn](https://www.torn.com/).
 4. Go to `Settings > API Key` & copy your key to clipboard.
-5. Go to `Items > Bazaar > Add Items > Configure`.
+5. Go to `City > Item Market > Add Items > Configure`.
 6. In the configuration popup, paste your API key into the `Torn API Key` field.
 7. Close configuration popup to save.
 8. Click `Start FATU's Pricer` to begin scraping & pricing items.
